@@ -91,7 +91,7 @@ resource "aws_lb_listener_rule" "forbidden" {
 
   condition {
     path_pattern {
-      values = ["/admin/*", "/login/*"]
+      values = ["/admin/*", "/login/*", "/profile/*", "/help/*"]
     }
   }
 }

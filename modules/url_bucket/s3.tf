@@ -41,7 +41,7 @@ resource "aws_s3_bucket_public_access_block" "private" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "b" {
+resource "aws_s3_bucket_policy" "read_vpc_only" {
   bucket = aws_s3_bucket.private.id
 
   policy = jsonencode({

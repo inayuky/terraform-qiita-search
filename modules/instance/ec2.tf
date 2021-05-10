@@ -13,10 +13,18 @@ variable "sg_ids" {
 variable "subnet_id" {
   description = "インスタンスが属するサブネット"
 }
+variable "role_name" {
+  description = "インスタンスに設定するIAMロール名"
+}
 
 # SSMから最新のAMIを取得
 data "aws_ssm_parameter" "amzn2_ami" {
   name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+}
+
+resource "aws_iam_instance_profile" "ssm_s3" {
+  name = "ssm_s3"
+  role = var.role_name
 }
 
 resource "aws_instance" "fess" {
@@ -32,6 +40,8 @@ resource "aws_instance" "fess" {
     volume_size = var.root_volume_size
     volume_type = var.root_volume_type
   }
+
+  iam_instance_profile = aws_iam_instance_profile.ssm_s3.name
 
   # fessのインストール
   user_data = file("${path.module}/install_fess.sh")

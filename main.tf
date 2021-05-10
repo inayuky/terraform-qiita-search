@@ -27,6 +27,30 @@ module "fess_sg" {
   source_sg_id = module.https_sg.security_group_id
 }
 
+module "ssm_s3_role" {
+  source     = "./modules/iam_role"
+  name       = "ssm_s3"
+  identifier = "ec2.amazonaws.com"
+}
+
+data "aws_iam_policy" "ssm" {
+  name = "AmazonSSMManagedInstanceCore"
+}
+
+data "aws_iam_policy" "s3full" {
+  name = "AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = module.ssm_s3_role.name
+  policy_arn = data.aws_iam_policy.ssm.arn
+}
+
+resource "aws_iam_role_policy_attachment" "s3full" {
+  role       = module.ssm_s3_role.name
+  policy_arn = data.aws_iam_policy.s3full.arn
+}
+
 module "instance" {
   source           = "./modules/instance"
   instance_type    = var.instance_type
@@ -34,6 +58,14 @@ module "instance" {
   subnet_id        = module.network.public_subnet0_id
   root_volume_size = var.root_volume_size
   root_volume_type = var.root_volume_type
+  role_name        = module.ssm_s3_role.name
+}
+
+module "url_bucket" {
+  source          = "./modules/url_bucket"
+  name            = var.url_bucket_name
+  vpc_id          = module.network.vpc_id
+  route_table_ids = [module.network.route_table_id]
 }
 
 module "log_bucket" {

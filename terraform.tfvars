@@ -8,3 +8,4 @@ instance_type = "t2.medium"
 root_volume_size = 15
 root_volume_type = "gp3"
 fess_port = 8080
+url_bucket_name = "inayuky-qiita-search-urls"

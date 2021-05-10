@@ -28,3 +28,6 @@ variable "root_volume_size" {
 variable "root_volume_type" {
   description = "ルートボリュームのタイプ"
 }
+variable "url_bucket_name" {
+  description = "QiitaのURL格納用のバケット名"
+}

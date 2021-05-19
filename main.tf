@@ -41,6 +41,10 @@ data "aws_iam_policy" "s3full" {
   name = "AmazonS3FullAccess"
 }
 
+data "aws_iam_policy" "cloudwatch" {
+  name = "CloudWatchAgentServerPolicy"
+}
+
 resource "aws_iam_role_policy_attachment" "ssm" {
   role       = module.ssm_s3_role.name
   policy_arn = data.aws_iam_policy.ssm.arn
@@ -49,6 +53,11 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 resource "aws_iam_role_policy_attachment" "s3full" {
   role       = module.ssm_s3_role.name
   policy_arn = data.aws_iam_policy.s3full.arn
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch" {
+  role       = module.ssm_s3_role.name
+  policy_arn = data.aws_iam_policy.cloudwatch.arn
 }
 
 module "instance" {

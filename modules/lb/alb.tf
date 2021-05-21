@@ -66,7 +66,7 @@ resource "aws_lb_target_group" "this" {
     healthy_threshold   = 3
     unhealthy_threshold = 3
     timeout             = 5
-    interval            = 30
+    interval            = 10
     matcher             = 200
     port                = "traffic-port" # 上で指定したportが使用される。
     protocol            = "HTTP"

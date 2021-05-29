@@ -1,0 +1,12 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.7.2
+    steps:
+      - aws-cli/setup
+      - checkout
+      - run: bundle install --gemfile scripts/Gemfile
+      - run: bundle exec ruby scripts/create_sitemap.rb 300 base sample-sitemap-for-fess
+orbs:
+  aws-cli: circleci/aws-cli@2.0.0

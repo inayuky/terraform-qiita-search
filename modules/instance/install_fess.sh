@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# change timezone
+timedatectl set-timezone Asia/Tokyo
+
 # install docker
 amazon-linux-extras install -y docker
 systemctl enable docker

@@ -1,12 +1,42 @@
 version: 2.1
 jobs:
-  build:
+  base-job:
     docker:
       - image: circleci/ruby:2.7.2
     steps:
       - checkout
       - aws-cli/setup
       - run: bundle install --gemfile scripts/Gemfile
-      - run: ruby scripts/create_sitemap.rb 300 base sample-sitemap-for-fess
+      - run: ruby scripts/create_sitemap.rb 3000 base sample-sitemap-for-fess
+  daily-job:
+    docker:
+      - image: circleci/ruby:2.7.2
+    steps:
+      - checkout
+      - aws-cli/setup
+      - run: bundle install --gemfile scripts/Gemfile
+      - run: ruby scripts/create_sitemap.rb 300 new sample-sitemap-for-fess
 orbs:
   aws-cli: circleci/aws-cli@2.0.0
+workflows:
+  version: 2
+  trigger_start:
+    triggers:
+      - schedule:
+          cron: "55 10 * * *"
+          # filters:
+          #   branches:
+          #     only:
+          #       - test # cronの動作を止めるため、存在しないブランチ名を指定している。動作確認するにはmainに変更する。
+    jobs:
+      - daily-job
+  trigger_stop:
+    triggers:
+      - schedule:
+          cron: "36 6 * * *"
+          # filters:
+            # branches:
+            #   only:
+            #     - test # cronの動作を止めるため、存在しないブランチ名を指定している。動作確認するにはmainに変更する。
+    jobs:
+      - base-job

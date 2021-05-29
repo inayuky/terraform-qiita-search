@@ -23,12 +23,20 @@ workflows:
   daily:
     triggers:
       - schedule:
-          cron: "03 17 * * *"
+          cron: "15 17 * * *"
+          filters:
+            branches:
+              only:
+                - main
     jobs:
       - daily-job
   base:
     triggers:
       - schedule:
-          cron: "10 117 * * *"
+          cron: "20 117 * * *"
+          filters:
+            branches:
+              only:
+                - main
     jobs:
       - base-job

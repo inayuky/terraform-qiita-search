@@ -68,6 +68,7 @@ module "instance" {
   root_volume_size = var.root_volume_size
   root_volume_type = var.root_volume_type
   role_name        = module.ssm_s3_role.name
+  instance_name    = var.domain_name
 }
 
 module "url_bucket" {

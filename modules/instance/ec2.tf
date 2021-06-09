@@ -16,6 +16,10 @@ variable "subnet_id" {
 variable "role_name" {
   description = "インスタンスに設定するIAMロール名"
 }
+variable "instance_name" {
+  description = "インスタンス名"
+}
+
 
 # SSMから最新のAMIを取得
 data "aws_ssm_parameter" "amzn2_ami" {
@@ -46,6 +50,9 @@ resource "aws_instance" "fess" {
   # fessのインストール
   user_data = file("${path.module}/install_fess.sh")
 
+  tags = {
+    Name = var.instance_name
+  }
 }
 
 output "id" {

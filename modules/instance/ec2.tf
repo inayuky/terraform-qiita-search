@@ -47,6 +47,9 @@ resource "aws_instance" "fess" {
 
   iam_instance_profile = aws_iam_instance_profile.ssm_s3.name
 
+  # EC2の削除保護
+  disable_api_termination = true
+
   # fessのインストール
   user_data = file("${path.module}/install_fess.sh")
 

@@ -1,42 +1,87 @@
 version: 2.1
 jobs:
-  base-job:
+  create_sitemap:
     docker:
       - image: circleci/ruby:2.7.2
     steps:
       - checkout
       - aws-cli/setup
       - run: bundle install --gemfile scripts/Gemfile
-      - run: ruby scripts/create_sitemap.rb 3000 base sample-sitemap-for-fess
-  daily-job:
+      - run: ruby scripts/create_sitemap.rb 3000 base inayuky-qiita-search-urls
+      - run: ruby scripts/create_sitemap.rb 300 new inayuky-qiita-search-urls
+  deploy:
     docker:
-      - image: circleci/ruby:2.7.2
+      - image: hashicorp/terraform:light
     steps:
       - checkout
+      - run: terraform init
+      - run: terraform apply -auto-approve
+  delete_alb:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run: terraform init
+      - run: terraform destroy -target=aws_lb.example -auto-approve
+  start_instance:
+    executor: aws-cli/default
+    steps:
       - aws-cli/setup
-      - run: bundle install --gemfile scripts/Gemfile
-      - run: ruby scripts/create_sitemap.rb 300 new sample-sitemap-for-fess
+      - jq/install
+      - run:
+          name: start instance
+          command: |
+            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search" "Name=instance-state-name,Values=stopped" | jq -r '.Reservations[].Instances[].InstanceId')
+            if [ -n "$instance_id" ]; then
+              aws ec2 start-instances --instance-ids $instance_id
+            else
+              echo "stopped instance not found"
+            fi
+  stop_instance:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/setup
+      - jq/install
+      - run:
+          name: stop instance
+          command: |
+            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search" "Name=instance-state-name,Values=running" | jq -r '.Reservations[].Instances[].InstanceId')
+            if [ -n "$instance_id" ]; then
+              aws ec2 stop-instances --instance-ids $instance_id
+            else
+              echo "running instance not found"
+            fi
 orbs:
+  jq: circleci/jq@2.2.0
   aws-cli: circleci/aws-cli@2.0.0
 workflows:
   version: 2
-  daily:
+  start_trigger:
     triggers:
       - schedule:
-          cron: "0 0 * * 0" # JST - 9時間 を指定する
+          cron: "45 5 * * 0" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
-                - test # TODO cron停止するため存在しないブランチを指定している
+                - main
     jobs:
-      - daily-job
-  base:
+      - create_sitemap
+      - start_instance:
+          requires:
+            - create_sitemap
+      - deploy:
+          requires:
+            - start_instance
+  end_trigger:
     triggers:
       - schedule:
-          cron: "30 0 * * *" # JST - 9時間 を指定する
+          cron: "0 0 * * 0" # (JST - 9時間) を指定する
           filters:
             branches:
               only:
-                - test # TODO cron停止するため存在しないブランチを指定している
+                - main
     jobs:
-      - base-job
+      - delete_alb
+      - stop_instance:
+          requires:
+            - delete_alb

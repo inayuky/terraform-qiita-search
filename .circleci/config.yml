@@ -22,7 +22,7 @@ jobs:
     steps:
       - checkout
       - run: terraform init
-      - run: terraform destroy -target=aws_lb.example -auto-approve
+      - run: terraform destroy -target=module.alb.aws_lb.this -auto-approve
   start_instance:
     executor: aws-cli/default
     steps:
@@ -75,7 +75,7 @@ workflows:
   stop_trigger:
     triggers:
       - schedule:
-          cron: "30 9 * * *" # UTC (JST - 9時間) を指定する
+          cron: "35 9 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:

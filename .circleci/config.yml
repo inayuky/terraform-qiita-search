@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run: terraform init
-      - run: terraform apply -auto-approve
+      - run: terraform apply -var-file terraform.tfvars -auto-approve
   delete_alb:
     docker:
       - image: hashicorp/terraform:light
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: start instance
           command: |
-            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search" "Name=instance-state-name,Values=stopped" | jq -r '.Reservations[].Instances[].InstanceId')
+            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search.com" "Name=instance-state-name,Values=stopped" | jq -r '.Reservations[].Instances[].InstanceId')
             if [ -n "$instance_id" ]; then
               aws ec2 start-instances --instance-ids $instance_id
             else
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: stop instance
           command: |
-            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search" "Name=instance-state-name,Values=running" | jq -r '.Reservations[].Instances[].InstanceId')
+            instance_id=$(aws ec2 describe-instances --filter "Name=tag:Name,Values=qiita-search.com" "Name=instance-state-name,Values=running" | jq -r '.Reservations[].Instances[].InstanceId')
             if [ -n "$instance_id" ]; then
               aws ec2 stop-instances --instance-ids $instance_id
             else
@@ -59,7 +59,7 @@ workflows:
   start_trigger:
     triggers:
       - schedule:
-          cron: "25 6 * * *" # UTC (JST - 9時間) を指定する
+          cron: "30 7 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
@@ -72,10 +72,10 @@ workflows:
       - deploy:
           requires:
             - start_instance
-  end_trigger:
+  stop_trigger:
     triggers:
       - schedule:
-          cron: "0 0 * * *" # (JST - 9時間) を指定する
+          cron: "0 9 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:

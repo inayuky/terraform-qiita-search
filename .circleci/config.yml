@@ -75,7 +75,7 @@ workflows:
   stop_trigger:
     triggers:
       - schedule:
-          cron: "0 9 * * *" # UTC (JST - 9時間) を指定する
+          cron: "30 9 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:

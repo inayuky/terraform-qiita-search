@@ -57,6 +57,7 @@ resource "aws_instance" "fess" {
     Name = var.instance_name
   }
 
+  # fessのインストールスクリプトの変更は無視する
   lifecycle {
     ignore_changes = [
       user_data,

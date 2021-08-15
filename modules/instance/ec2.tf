@@ -56,6 +56,12 @@ resource "aws_instance" "fess" {
   tags = {
     Name = var.instance_name
   }
+
+  lifecycle {
+    ignore_changes = [
+      user_data,
+    ]
+  }
 }
 
 output "id" {

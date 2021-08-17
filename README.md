@@ -32,7 +32,7 @@ $ terraform init
 
 作成後、以下でALB関連リソースのみ削除できる。
 
-`$ terraform destory -target=module.alb`
+`$ terraform destroy -target=module.alb.aws_lb.this`
 
 ALB削除後は再度applyすれば復旧する。
 

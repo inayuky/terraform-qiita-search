@@ -63,7 +63,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - stop # 停止するため存在しないブランチを指定
     jobs:
       - create_sitemap
       - start_instance:
@@ -79,7 +79,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - stop # 停止するため存在しないブランチを指定
     jobs:
       - delete_alb
       - stop_instance:

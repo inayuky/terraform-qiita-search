@@ -1,5 +1,6 @@
 require 'qiita'
 require 'fileutils'
+require 'pstore'
 
 module AwsCli
   module S3
@@ -20,51 +21,16 @@ end
 
 class QiitaArticle
 
-  def initialize(sitemap="sitemap.xml", new_sitemap="new_sitemap.xml")
+  def initialize(sitemap="sitemap.xml")
     @sitemap = sitemap # baseとなるsitemap名
-    @new_sitemap = new_sitemap # baseから差分として作成するsitemap名
   end
 
   # baseとなるsitemapをS3に作成する
   def create_base_sitemap(num_of_urls, bucket_name)
-    urls = get_urls(num_of_urls, 100)
+    urls = get_urls(num_of_urls, 10)
     create_sitemap(urls.reverse, @sitemap)
     AwsCli::S3.upload(bucket_name, @sitemap)
     FileUtils.rm_f(@sitemap)
-  end
-
-  # 古いsitemapと比較して新しいurlのみを別のsitemapとしてS3に作成する
-  # 新しいsitemapはクロール時間を削減するために使用する
-  def create_new_sitemap(num_of_urls, bucket_name)
-    old_urls = get_urls_from_sitemap(bucket_name, @sitemap)
-    new_urls = get_urls(num_of_urls, 10)
-
-    # 新規urlのみを抽出してsitemapをS3に作成する
-    diff_urls = new_urls - old_urls
-    if diff_urls.size == 0
-      puts "new url does not exist"
-      return
-    end
-    create_sitemap(diff_urls.reverse, @new_sitemap)
-    AwsCli::S3.upload(bucket_name, @new_sitemap)
-    FileUtils.rm_f(@new_sitemap)
-
-    # 既存のsitemapに新規のurlを追加する
-    sum_urls = (old_urls + new_urls).uniq
-    create_sitemap(sum_urls.reverse, @sitemap)
-    AwsCli::S3.upload(bucket_name, @sitemap)
-    FileUtils.rm_f(@sitemap)
-  end
-
-  # sitemap内からurlのみを抽出
-  def get_urls_from_sitemap(bucket_name, file_name)
-    AwsCli::S3.download(bucket_name, file_name)
-    urls = []
-    File.foreach(file_name) do |file|
-      urls << file.gsub(/<loc>|<\/loc>/, "").chomp if file.include?("loc")
-    end
-    FileUtils.rm_f(file_name)
-    urls
   end
 
   # Qiitaの記事を取得
@@ -72,7 +38,10 @@ class QiitaArticle
   # stocks以上のストック数の記事を取得する
   # 環境変数"QIITA_ACCESS_TOKEN"にQiitaのAPI keyが必要
   def get_urls(num_of_urls, stocks)
-    client = Qiita::Client.new
+    qiita_token = ENV['QIITA_ACCESS_TOKEN']
+    return "QIITA_ACCESS_TOKEN not found" unless qiita_token
+
+    client = Qiita::Client.new(access_token: qiita_token)
 
     per_page = 100 # １ページ辺りの記事数(最大100)
     params = {
@@ -114,6 +83,5 @@ end
 
 # debug code
 # qa = QiitaArticle.new
-# qa.get_urls(300, 10)
+# urls = qa.get_urls(300, 10)
 # qa.create_base_sitemap(100, "sample-sitemap-for-fess")
-# qa.create_new_sitemap(100, "sample-sitemap-for-fess")

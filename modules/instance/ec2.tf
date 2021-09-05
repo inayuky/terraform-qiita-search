@@ -62,6 +62,9 @@ resource "aws_instance" "fess" {
     ignore_changes = [
       user_data,         # fessのインストールスクリプト
       root_block_device, # ボリューム拡張時など
+      ami,               # イメージ
+      public_dns,
+      public_ip,
     ]
   }
 }

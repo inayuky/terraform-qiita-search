@@ -7,7 +7,7 @@ jobs:
       - checkout
       - aws-cli/setup
       - run: bundle install --gemfile scripts/Gemfile
-      - run: ruby scripts/create_sitemap.rb
+      - run: ruby scripts/create_sitemap.rb 50
   deploy:
     docker:
       - image: hashicorp/terraform:light

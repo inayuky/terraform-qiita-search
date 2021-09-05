@@ -34,7 +34,7 @@ class QiitaArticle
   end
 
   # Qiitaの記事を取得
-  # num_of_urlsは100単位
+  # num_of_urlsは取得したい記事数(100以下 or 100の倍数)
   # stocks以上のストック数の記事を取得する
   # 環境変数"QIITA_ACCESS_TOKEN"にQiitaのAPI keyが必要
   def get_urls(num_of_urls, stocks)
@@ -43,7 +43,7 @@ class QiitaArticle
 
     client = Qiita::Client.new(access_token: qiita_token)
 
-    per_page = 100 # １ページ辺りの記事数(最大100)
+    per_page = 100 < num_of_urls ? 100 : num_of_urls # １ページ辺りの記事数(最大100)
     params = {
       per_page: per_page,
       query: "stocks:>=" + stocks.to_s # 検索条件
@@ -83,5 +83,5 @@ end
 
 # debug code
 # qa = QiitaArticle.new
-# urls = qa.get_urls(300, 10)
+# urls = qa.get_urls(50, 10)
 # qa.create_base_sitemap(100, "sample-sitemap-for-fess")

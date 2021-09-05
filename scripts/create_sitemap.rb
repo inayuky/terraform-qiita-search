@@ -6,8 +6,11 @@ require 'qiita_article'
 # 1: バケット名
 #
 # 実行例)
-# ruby create_sitemap.rb 100
-# → 100個の記事のURLをQiitaから取得し、デフォルトバケットの中にsitemapとして保存する
+# ruby create_sitemap.rb 50
+# → 50個の記事のURLをQiitaから取得し、デフォルトバケットの中にsitemapとして保存する
+#
+# ruby create_sitemap.rb 1000 sample-bucket
+# → 1000個の記事のURLをQiitaから取得し、sample-bucketの中にsitemapとして保存する
 
 DEFAULT_NUM_OF_URLS = 100
 DEFAULT_BUCKET_NAME = "inayuky-qiita-search-urls"

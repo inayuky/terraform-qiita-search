@@ -7,8 +7,7 @@ jobs:
       - checkout
       - aws-cli/setup
       - run: bundle install --gemfile scripts/Gemfile
-      - run: ruby scripts/create_sitemap.rb 3000 base inayuky-qiita-search-urls
-      - run: ruby scripts/create_sitemap.rb 300 new inayuky-qiita-search-urls
+      - run: ruby scripts/create_sitemap.rb
   deploy:
     docker:
       - image: hashicorp/terraform:light
@@ -59,11 +58,11 @@ workflows:
   start_trigger:
     triggers:
       - schedule:
-          cron: "30 7 * * *" # UTC (JST - 9時間) を指定する
+          cron: "45 20 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
-                - stop # 停止するため存在しないブランチを指定
+                - main
     jobs:
       - create_sitemap
       - start_instance:
@@ -75,11 +74,11 @@ workflows:
   stop_trigger:
     triggers:
       - schedule:
-          cron: "35 9 * * *" # UTC (JST - 9時間) を指定する
+          cron: "20 21 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
-                - stop # 停止するため存在しないブランチを指定
+                - main
     jobs:
       - delete_alb
       - stop_instance:

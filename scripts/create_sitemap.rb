@@ -15,11 +15,12 @@ require 'date'
 
 DEFAULT_NUM_OF_URLS = 100
 DEFAULT_BUCKET_NAME = "inayuky-qiita-search-urls"
-today = Date.today
-DEFAULT_SITEMAP_NAME = "sitemap" + today.year.to_s + today.cweek.to_s + ".xml"
 
 num_of_urls = ARGV[0] ? ARGV[0].to_i : DEFAULT_NUM_OF_URLS
 bucket_name = ARGV[1] || DEFAULT_BUCKET_NAME
 
-qa = QiitaArticle.new(DEFAULT_SITEMAP_NAME)
+today = Date.today
+sitemap = "sitemap" + today.year.to_s + today.cweek.to_s + ".xml"
+
+qa = QiitaArticle.new(sitemap)
 qa.create_base_sitemap(num_of_urls, bucket_name)

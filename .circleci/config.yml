@@ -78,7 +78,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - test # TODO cron停止するため存在しないブランチを指定している
     jobs:
       - delete_alb
       - stop_instance:

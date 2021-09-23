@@ -58,7 +58,7 @@ workflows:
   start_trigger:
     triggers:
       - schedule:
-          cron: "50 24 * * *" # UTC (JST - 9時間) を指定する
+          cron: "0 1 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:

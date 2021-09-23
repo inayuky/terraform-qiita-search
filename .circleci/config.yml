@@ -58,7 +58,7 @@ workflows:
   start_trigger:
     triggers:
       - schedule:
-          cron: "45 20 * * *" # UTC (JST - 9時間) を指定する
+          cron: "50 24 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
@@ -74,11 +74,11 @@ workflows:
   stop_trigger:
     triggers:
       - schedule:
-          cron: "20 21 * * *" # UTC (JST - 9時間) を指定する
+          cron: "0 8 * * *" # UTC (JST - 9時間) を指定する
           filters:
             branches:
               only:
-                - test # TODO cron停止するため存在しないブランチを指定している
+                - main
     jobs:
       - delete_alb
       - stop_instance:

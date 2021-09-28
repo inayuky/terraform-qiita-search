@@ -62,7 +62,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - test # cron停止するために存在しないブランチ名を指定している
     jobs:
       - create_sitemap
       - start_instance:
@@ -78,7 +78,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - test # cron停止するために存在しないブランチ名を指定している
     jobs:
       - delete_alb
       - stop_instance:
